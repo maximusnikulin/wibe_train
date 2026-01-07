@@ -8,12 +8,6 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 export class TransactionsController {
   constructor(private readonly transactionsService: TransactionsService) {}
 
-  // POST /api/transactions/deposit - Пополнить счёт
-  @Post('deposit')
-  deposit(@Request() req, @Body() depositDto: DepositDto) {
-    return this.transactionsService.createDepositTransaction(req.user.id, depositDto.amount);
-  }
-
   // GET /api/transactions - Получить историю транзакций текущего пользователя
   @Get()
   findByUser(@Request() req) {

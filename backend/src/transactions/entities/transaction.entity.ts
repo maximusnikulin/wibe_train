@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-import { Payment } from './payment.entity';
+import { Payment } from '../../payments/entities/payment.entity';
 
 // Тип транзакции
 export enum TransactionType {

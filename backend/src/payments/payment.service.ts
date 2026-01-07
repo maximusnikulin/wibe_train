@@ -8,7 +8,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
-import { Payment, PaymentStatus, PaymentType } from '../transactions/entities/payment.entity';
+import { Payment, PaymentStatus, PaymentType } from './entities/payment.entity';
 import { Transaction, TransactionType } from '../transactions/entities/transaction.entity';
 import { User } from '../users/entities/user.entity';
 import { TinkoffMockService } from '../external-banking/tinkoff-mock.service';
