@@ -1,0 +1,89 @@
+version: '3.8'
+
+services:
+  # ============================================
+  # MySQL Database
+  # ============================================
+  mysql:
+    image: mysql:8.0
+    container_name: betting_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: betting_platform
+      MYSQL_USER: betting_user
+      MYSQL_PASSWORD: betting_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - betting_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # ============================================
+  # Backend (NestJS)
+  # ============================================
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: betting_backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      NODE_ENV: development
+      DB_HOST: mysql
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - betting_network
+    depends_on:
+      mysql:
+        condition: service_healthy
+    command: npm run start:dev
+
+  # ============================================
+  # Frontend (React)
+  # ============================================
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: betting_frontend
+    restart: unless-stopped
+    environment:
+      REACT_APP_API_URL: http://localhost:3001/api
+      NODE_ENV: development
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - betting_network
+    depends_on:
+      - backend
+    command: npm run dev -- --host
+
+# ============================================
+# Networks
+# ============================================
+networks:
+  betting_network:
+    driver: bridge
+
+# ============================================
+# Volumes
+# ============================================
+volumes:
+  mysql_data:
+    driver: local
