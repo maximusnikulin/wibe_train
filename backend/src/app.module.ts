@@ -6,6 +6,8 @@ import { UsersModule } from './users/users.module';
 import { CompetitionsModule } from './competitions/competitions.module';
 import { BetsModule } from './bets/bets.module';
 import { TransactionsModule } from './transactions/transactions.module';
+import { ExternalBankingModule } from './external-banking/external-banking.module';
+import { PaymentModule } from './payments/payment.module';
 
 @Module({
   imports: [
@@ -38,6 +40,8 @@ import { TransactionsModule } from './transactions/transactions.module';
     CompetitionsModule,
     BetsModule,
     TransactionsModule,
+    ExternalBankingModule,
+    PaymentModule,
   ],
 })
 export class AppModule {}

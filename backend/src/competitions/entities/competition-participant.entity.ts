@@ -13,10 +13,6 @@ export class CompetitionParticipant {
   @Column()
   userId: number;
 
-  // Коэффициент ставки на этого участника (например, 2.5)
-  @Column({ type: 'decimal', precision: 10, scale: 2, default: 1.0 })
-  odds: number;
-
   // Дополнительная информация об участнике
   @Column({ type: 'text', nullable: true })
   additionalInfo: string;

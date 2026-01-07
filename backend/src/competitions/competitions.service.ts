@@ -60,7 +60,6 @@ export class CompetitionsService {
   async addParticipant(
     competitionId: number,
     userId: number,
-    odds: number,
     additionalInfo?: string,
   ): Promise<CompetitionParticipant> {
     const competition = await this.findOne(competitionId);
@@ -68,7 +67,6 @@ export class CompetitionsService {
     const participant = this.participantsRepository.create({
       competitionId: competition.id,
       userId,
-      odds,
       additionalInfo,
     });
 

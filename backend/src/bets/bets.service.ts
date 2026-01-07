@@ -30,7 +30,7 @@ export class BetsService {
       throw new BadRequestException('Ставки на это состязание больше не принимаются');
     }
 
-    // Получаем участника и его коэффициент
+    // Проверяем существование участника
     const participants = await this.competitionsService.getParticipants(competitionId);
     const participant = participants.find((p) => p.id === participantId);
 
@@ -47,17 +47,12 @@ export class BetsService {
     // Списываем средства с баланса
     await this.usersService.subtractBalance(userId, amount);
 
-    // Рассчитываем потенциальный выигрыш
-    const potentialWinning = Math.floor(amount * Number(participant.odds));
-
     // Создаём ставку
     const bet = this.betsRepository.create({
       userId,
       competitionId,
       participantId,
       amount,
-      odds: participant.odds,
-      potentialWinning,
       status: BetStatus.PENDING,
     });
 
@@ -101,25 +96,35 @@ export class BetsService {
     });
 
     for (const bet of bets) {
-      // Проверяем, выиграла ли ставка
+      // Проверяем, выиграл ли участник, на которого была сделана ставка
       if (bet.participant.userId === winnerId) {
-        // Ставка выиграла
+        // Участник выиграл - деньги переходят участнику
         bet.status = BetStatus.WON;
         await this.betsRepository.save(bet);
 
-        // Начисляем выигрыш пользователю
-        await this.usersService.addBalance(bet.userId, bet.potentialWinning);
+        // Начисляем сумму ставки участнику (winnerId)
+        await this.usersService.addBalance(winnerId, bet.amount);
 
-        // Создаём транзакцию выигрыша
+        // Создаём транзакцию выигрыша для участника
         await this.transactionsService.createWinningTransaction(
-          bet.userId,
-          bet.potentialWinning,
+          winnerId,
+          bet.amount,
           bet.id,
         );
       } else {
-        // Ставка проиграла
+        // Участник проиграл - возвращаем деньги пользователю
         bet.status = BetStatus.LOST;
         await this.betsRepository.save(bet);
+
+        // Возвращаем сумму ставки пользователю
+        await this.usersService.addBalance(bet.userId, bet.amount);
+
+        // Создаём транзакцию возврата для пользователя
+        await this.transactionsService.createRefundTransaction(
+          bet.userId,
+          bet.amount,
+          bet.id,
+        );
       }
     }
   }

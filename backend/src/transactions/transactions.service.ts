@@ -61,6 +61,22 @@ export class TransactionsService {
     return this.transactionsRepository.save(transaction);
   }
 
+  // Создать транзакцию возврата
+  async createRefundTransaction(userId: number, amount: number, betId: number): Promise<Transaction> {
+    const user = await this.usersService.findOne(userId);
+
+    const transaction = this.transactionsRepository.create({
+      userId,
+      type: TransactionType.REFUND,
+      amount,
+      balanceAfter: user.balance,
+      description: `Возврат средств по ставке #${betId} на сумму ${amount} коп.`,
+      betId,
+    });
+
+    return this.transactionsRepository.save(transaction);
+  }
+
   // Получить историю транзакций пользователя
   async findByUser(userId: number): Promise<Transaction[]> {
     return this.transactionsRepository.find({

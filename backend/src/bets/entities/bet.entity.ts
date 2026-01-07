@@ -29,14 +29,6 @@ export class Bet {
   @Column({ type: 'bigint' })
   amount: number;
 
-  // Коэффициент на момент ставки
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
-  odds: number;
-
-  // Потенциальный выигрыш (amount * odds)
-  @Column({ type: 'bigint' })
-  potentialWinning: number;
-
   @Column({
     type: 'enum',
     enum: BetStatus,
