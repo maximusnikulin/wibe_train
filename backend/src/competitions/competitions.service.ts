@@ -1,11 +1,12 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {Injectable, NotFoundException, BadRequestException, Inject, forwardRef} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Competition } from './entities/competition.entity';
+import { Repository, In } from 'typeorm';
+import {Competition, CompetitionStatus} from './entities/competition.entity';
 import { CompetitionParticipant } from './entities/competition-participant.entity';
 import { User, UserRole } from '../users/entities/user.entity';
 import { CreateCompetitionDto } from './dto/create-competition.dto';
 import { UpdateCompetitionDto } from './dto/update-competition.dto';
+import {BetsService} from "../bets/bets.service";
 
 @Injectable()
 export class CompetitionsService {
@@ -16,12 +17,25 @@ export class CompetitionsService {
     private participantsRepository: Repository<CompetitionParticipant>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @Inject(forwardRef(() => BetsService))
+    private betsService: BetsService,
   ) {}
 
   // Создать состязание
   async create(createCompetitionDto: CreateCompetitionDto): Promise<Competition> {
-    const competition = this.competitionsRepository.create(createCompetitionDto);
-    return this.competitionsRepository.save(competition);
+    const { participantsIds, ...competitionData } = createCompetitionDto;
+
+    // Создаём состязание
+    const competition = this.competitionsRepository.create(competitionData);
+    const savedCompetition = await this.competitionsRepository.save(competition);
+
+    // Если указаны участники, добавляем их
+    if (participantsIds && participantsIds.length > 0) {
+      await this.validateAndAddParticipants(savedCompetition.id, participantsIds);
+    }
+
+    // Возвращаем состязание с участниками
+    return this.findOne(savedCompetition.id);
   }
 
   // Получить все состязания
@@ -48,32 +62,47 @@ export class CompetitionsService {
 
   // Обновить состязание
   async update(id: number, updateCompetitionDto: UpdateCompetitionDto): Promise<Competition> {
+    const { participantsIds, ...competitionData } = updateCompetitionDto;
+
     const competition = await this.findOne(id);
-    Object.assign(competition, updateCompetitionDto);
-    return this.competitionsRepository.save(competition);
+    if (competition.status === CompetitionStatus.FINISHED || competition.status === CompetitionStatus.CANCELLED) {
+      throw new BadRequestException("Нельзя обновить завершенное или отмененное событие")
+    }
+
+    Object.assign(competition, competitionData);
+    await this.competitionsRepository.save(competition);
+
+    // Если указаны участники, заменяем текущих
+    if (participantsIds !== undefined) {
+      // Удаляем текущих участников
+      await this.participantsRepository.delete({ competitionId: id });
+
+      // Добавляем новых участников (если массив не пустой)
+      if (participantsIds.length > 0) {
+        await this.validateAndAddParticipants(id, participantsIds);
+      }
+    }
+
+    // Возвращаем обновлённое состязание с участниками
+    return this.findOne(id);
+  }
+
+  async end(id: number, winnerId: number): Promise<Competition> {
+    const competition = await this.findOne(id);
+    Object.assign(competition, {
+      winnerId,
+      status: CompetitionStatus.FINISHED
+    });
+
+    await this.betsService.processCompetitionResults(id, winnerId)
+    await this.competitionsRepository.save(competition)
+    return this.findOne(id);
   }
 
   // Удалить состязание
   async remove(id: number): Promise<void> {
     const competition = await this.findOne(id);
     await this.competitionsRepository.remove(competition);
-  }
-
-  // Добавить участника к состязанию
-  async addParticipant(
-    competitionId: number,
-    userId: number,
-    additionalInfo?: string,
-  ): Promise<CompetitionParticipant> {
-    const competition = await this.findOne(competitionId);
-
-    const participant = this.participantsRepository.create({
-      competitionId: competition.id,
-      userId,
-      additionalInfo,
-    });
-
-    return this.participantsRepository.save(participant);
   }
 
   // Получить всех участников состязания
@@ -107,5 +136,46 @@ export class CompetitionsService {
     const competitions = participants.map(p => p.competition);
 
     return competitions;
+  }
+
+  /**
+   * Вспомогательный метод: валидация и добавление участников
+   */
+  private async validateAndAddParticipants(
+    competitionId: number,
+    participantsIds: number[],
+  ): Promise<void> {
+    // Получаем всех пользователей по ID
+    const users = await this.userRepository.find({
+      where: { id: In(participantsIds) }
+    });
+
+    // Проверяем, что все пользователи найдены
+    if (users.length !== participantsIds.length) {
+      const foundIds = users.map(u => u.id);
+      const notFoundIds = participantsIds.filter(id => !foundIds.includes(id));
+      throw new NotFoundException(
+        `Пользователи с ID ${notFoundIds.join(', ')} не найдены`
+      );
+    }
+
+    // Проверяем, что все пользователи имеют роль PARTICIPANT
+    const nonParticipants = users.filter(u => u.role !== UserRole.PARTICIPANT);
+    if (nonParticipants.length > 0) {
+      const nonParticipantIds = nonParticipants.map(u => u.id).join(', ');
+      throw new BadRequestException(
+        `Пользователи с ID ${nonParticipantIds} не имеют роль PARTICIPANT`
+      );
+    }
+
+    // Создаём записи участников
+    const participants = participantsIds.map(userId =>
+      this.participantsRepository.create({
+        competitionId,
+        userId,
+      })
+    );
+
+    await this.participantsRepository.save(participants);
   }
 }

@@ -6,6 +6,7 @@ import { Transaction } from '../../transactions/entities/transaction.entity';
 export enum UserRole {
   FAN = 'fan', // Болельщик
   PARTICIPANT = 'participant', // Участник состязания
+  ADMIN = "admin"
 }
 
 @Entity('users')
@@ -48,4 +49,7 @@ export class User {
 
   @OneToMany(() => Transaction, (transaction) => transaction.user)
   transactions: Transaction[];
+
+  @Column({ default: false })
+  isAdmin: false
 }

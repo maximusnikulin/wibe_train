@@ -53,6 +53,7 @@ async function bootstrap() {
   await app.listen(port);
   console.log(`Приложение запущено на порту ${port}`);
   console.log(`Swagger документация доступна по адресу: http://localhost:${port}/api/docs`);
+  console.log(`Swagger JSON для Postman: http://localhost:${port}/api/docs-json`);
 }
 
 bootstrap();

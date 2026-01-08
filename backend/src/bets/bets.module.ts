@@ -11,7 +11,7 @@ import { TransactionsModule } from '../transactions/transactions.module';
   imports: [
     TypeOrmModule.forFeature([Bet]),
     UsersModule,
-    CompetitionsModule,
+    forwardRef(() => CompetitionsModule), // forwardRef для избежания циклической зависимости
     forwardRef(() => TransactionsModule), // forwardRef для избежания циклической зависимости
   ],
   controllers: [BetsController],

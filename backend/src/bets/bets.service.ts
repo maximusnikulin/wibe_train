@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {Injectable, BadRequestException, NotFoundException, Inject, forwardRef} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Bet, BetStatus } from './entities/bet.entity';
@@ -14,7 +14,9 @@ export class BetsService {
     @InjectRepository(Bet)
     private betsRepository: Repository<Bet>,
     private usersService: UsersService,
+    @Inject(forwardRef(() => CompetitionsService))
     private competitionsService: CompetitionsService,
+    @Inject(forwardRef(() => TransactionsService))
     private transactionsService: TransactionsService,
   ) {}
 

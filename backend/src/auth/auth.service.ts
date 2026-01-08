@@ -92,6 +92,7 @@ export class AuthService {
         lastName: user.lastName,
         role: user.role,
         balance: user.balance,
+        isAdmin: user.isAdmin
       },
     };
   }

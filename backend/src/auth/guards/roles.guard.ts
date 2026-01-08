@@ -1,6 +1,6 @@
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { UserRole } from '../../users/entities/user.entity';
+import {CanActivate, ExecutionContext, ForbiddenException, Injectable} from '@nestjs/common';
+import {Reflector} from '@nestjs/core';
+import {UserRole} from '../../users/entities/user.entity';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -20,7 +20,13 @@ export class RolesGuard implements CanActivate {
       throw new ForbiddenException('Доступ запрещён');
     }
 
-    const hasRole = requiredRoles.includes(user.role);
+    let hasRole = false
+    if (requiredRoles.includes(UserRole.ADMIN)) {
+      hasRole = user.isAdmin
+    } else {
+      hasRole = requiredRoles.includes(user.role);
+    }
+
 
     if (!hasRole) {
       throw new ForbiddenException('Недостаточно прав для выполнения этой операции');
