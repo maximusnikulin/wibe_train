@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Competition } from './entities/competition.entity';
 import { CompetitionParticipant } from './entities/competition-participant.entity';
+import { User, UserRole } from '../users/entities/user.entity';
 import { CreateCompetitionDto } from './dto/create-competition.dto';
 import { UpdateCompetitionDto } from './dto/update-competition.dto';
 
@@ -13,6 +14,8 @@ export class CompetitionsService {
     private competitionsRepository: Repository<Competition>,
     @InjectRepository(CompetitionParticipant)
     private participantsRepository: Repository<CompetitionParticipant>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
   // Создать состязание
@@ -79,5 +82,30 @@ export class CompetitionsService {
       where: { competitionId },
       relations: ['user'],
     });
+  }
+
+  // Получить все состязания, в которых участвует пользователь
+  async findByParticipant(userId: number): Promise<Competition[]> {
+    // Проверяем существование пользователя
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException('Пользователь не найден');
+    }
+
+    // Проверяем, что пользователь имеет роль PARTICIPANT
+    if (user.role !== UserRole.PARTICIPANT) {
+      throw new BadRequestException('Пользователь не является участником состязаний');
+    }
+
+    const participants = await this.participantsRepository.find({
+      where: { userId },
+      relations: ['competition', 'competition.participants', 'competition.participants.user'],
+    });
+
+    // Извлекаем уникальные состязания из участников
+    const competitions = participants.map(p => p.competition);
+
+    return competitions;
   }
 }

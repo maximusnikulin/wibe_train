@@ -1,20 +1,25 @@
 import { Controller, Post, Body, HttpCode, HttpStatus, Logger } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiExcludeEndpoint } from '@nestjs/swagger';
 import { PaymentService } from './payment.service';
 import { TinkoffWebhookDto } from './dto/tinkoff-webhook.dto';
-import { PaymentType } from '../transactions/entities/payment.entity';
+import { PaymentType } from './entities/payment.entity';
 
+@ApiTags('payments')
 @Controller('webhooks')
 export class WebhooksController {
   private readonly logger = new Logger(WebhooksController.name);
 
   constructor(private readonly paymentService: PaymentService) {}
 
-  /**
-   * POST /api/webhooks/tinkoff - Единый webhook endpoint от Тинькофф
-   * Автоматически определяет тип операции (deposit или payout)
-   */
   @Post('tinkoff')
   @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Webhook от Тинькофф для обработки платежей',
+    description: 'Единый endpoint для уведомлений от Тинькофф. Автоматически определяет тип операции (deposit/payout). НЕ требует авторизации.'
+  })
+  @ApiResponse({ status: 200, description: 'Webhook успешно обработан' })
+  @ApiResponse({ status: 400, description: 'Некорректные данные webhook' })
+  @ApiResponse({ status: 404, description: 'Платеж не найден' })
   async handleTinkoffWebhook(@Body() webhookData: TinkoffWebhookDto) {
     this.logger.log(`Получен webhook от Тинькофф: ${JSON.stringify(webhookData)}`);
 

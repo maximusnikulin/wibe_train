@@ -9,7 +9,7 @@ import {
   Index
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-import { Transaction } from './transaction.entity';
+import { Transaction } from '../../transactions/entities/transaction.entity';
 
 // Тип платежа
 export enum PaymentType {
