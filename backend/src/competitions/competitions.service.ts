@@ -89,13 +89,31 @@ export class CompetitionsService {
 
   async end(id: number, winnerId: number): Promise<Competition> {
     const competition = await this.findOne(id);
+
+    // Проверка статуса соревнования
+    if (competition.status === CompetitionStatus.FINISHED) {
+      throw new BadRequestException('Соревнование уже завершено');
+    }
+    if (competition.status === CompetitionStatus.CANCELLED) {
+      throw new BadRequestException('Соревнование отменено');
+    }
+
+    // Валидация winnerId как участника соревнования
+    const isParticipant = competition.participants?.some(
+      (p) => p.userId === winnerId
+    );
+    if (!isParticipant) {
+      throw new BadRequestException('Победитель должен быть участником соревнования');
+    }
+
     Object.assign(competition, {
       winnerId,
       status: CompetitionStatus.FINISHED
     });
 
-    await this.betsService.processCompetitionResults(id, winnerId)
-    await this.competitionsRepository.save(competition)
+    await this.betsService.processCompetitionResults(id, winnerId);
+    await this.competitionsRepository.save(competition);
+
     return this.findOne(id);
   }
 
