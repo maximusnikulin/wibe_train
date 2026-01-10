@@ -24,29 +24,47 @@ export interface Bet {
   id: number;
   userId: number;
   competitionId: number;
+  participantId: number;
   amount: number;
-  prediction: string;
   status: 'pending' | 'won' | 'lost' | 'cancelled';
   createdAt: string;
   updatedAt: string;
+  competition?: Competition;
+  participant?: {
+    id: number;
+    userId: number;
+    user?: User;
+    additionalInfo?: string;
+  };
 }
 
 export interface Payment {
   id: number;
   userId: number;
   amount: number;
-  status: 'pending' | 'completed' | 'failed' | 'cancelled';
+  type: 'deposit' | 'withdrawal';
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'cancelled';
   paymentUrl?: string;
+  externalId?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface DepositResponse {
+  payment_id: number;
+  payment_url: string;
+  amount: number;
 }
 
 export interface Transaction {
   id: number;
   userId: number;
-  type: 'deposit' | 'withdrawal' | 'bet' | 'win' | 'refund';
+  type: 'deposit' | 'bet' | 'winning' | 'refund' | 'bet_refund';
   amount: number;
+  balanceAfter: number;
   description: string;
+  betId?: number;
+  paymentId?: number;
   createdAt: string;
 }
 

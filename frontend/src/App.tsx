@@ -5,6 +5,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { Dashboard } from './pages/Dashboard';
+import { FanDashboard } from './pages/FanDashboard';
 import { Competitions } from './pages/Competitions';
 import { CompetitionDetails } from './pages/CompetitionDetails';
 import { MockPayment } from './pages/MockPayment';
@@ -32,6 +33,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/fan-dashboard"
+              element={
+                <ProtectedRoute>
+                  <FanDashboard />
                 </ProtectedRoute>
               }
             />
