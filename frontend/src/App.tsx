@@ -2,13 +2,16 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import { Login } from './pages/Login';
+import { RoleProtectedRoute } from './components/RoleProtectedRoute';
+import { RoleBasedRedirect } from './components/RoleBasedRedirect';
+import { Home } from './pages/Home';
 import { Register } from './pages/Register';
-import { Dashboard } from './pages/Dashboard';
 import { FanDashboard } from './pages/FanDashboard';
+import { ParticipantDashboard } from './pages/ParticipantDashboard';
 import { Competitions } from './pages/Competitions';
 import { CompetitionDetails } from './pages/CompetitionDetails';
 import { MockPayment } from './pages/MockPayment';
+import { NotFound } from './pages/NotFound';
 import './App.css';
 
 const queryClient = new QueryClient({
@@ -26,13 +29,13 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Login />} />
+            <Route path="/" element={<Home />} />
             <Route path="/register" element={<Register />} />
             <Route
               path="/dashboard"
               element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <RoleBasedRedirect />
                 </ProtectedRoute>
               }
             />
@@ -40,7 +43,19 @@ function App() {
               path="/fan-dashboard"
               element={
                 <ProtectedRoute>
-                  <FanDashboard />
+                  <RoleProtectedRoute allowedRoles={['fan']}>
+                    <FanDashboard />
+                  </RoleProtectedRoute>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/participant-dashboard"
+              element={
+                <ProtectedRoute>
+                  <RoleProtectedRoute allowedRoles={['participant']}>
+                    <ParticipantDashboard />
+                  </RoleProtectedRoute>
                 </ProtectedRoute>
               }
             />
@@ -61,6 +76,7 @@ function App() {
               }
             />
             <Route path="/mock-payment/:paymentId" element={<MockPayment />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>

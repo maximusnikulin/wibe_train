@@ -4,6 +4,7 @@ import { Repository, In } from 'typeorm';
 import {Competition, CompetitionStatus} from './entities/competition.entity';
 import { CompetitionParticipant } from './entities/competition-participant.entity';
 import { User, UserRole } from '../users/entities/user.entity';
+import { Bet } from '../bets/entities/bet.entity';
 import { CreateCompetitionDto } from './dto/create-competition.dto';
 import { UpdateCompetitionDto } from './dto/update-competition.dto';
 import {BetsService} from "../bets/bets.service";
@@ -17,6 +18,8 @@ export class CompetitionsService {
     private participantsRepository: Repository<CompetitionParticipant>,
     @InjectRepository(User)
     private userRepository: Repository<User>,
+    @InjectRepository(Bet)
+    private betsRepository: Repository<Bet>,
     @Inject(forwardRef(() => BetsService))
     private betsService: BetsService,
   ) {}
@@ -154,6 +157,62 @@ export class CompetitionsService {
     const competitions = participants.map(p => p.competition);
 
     return competitions;
+  }
+
+  // Получить состязания участника со статистикой ставок
+  async findByParticipantWithStats(userId: number): Promise<any[]> {
+    // Получаем все записи участия пользователя
+    const participations = await this.participantsRepository.find({
+      where: { userId },
+      relations: ['competition'],
+    });
+
+    const result = [];
+
+    for (const participation of participations) {
+      const competition = participation.competition;
+
+      // Получаем все ставки на этого участника в данном соревновании
+      const betsOnParticipant = await this.betsRepository.find({
+        where: {
+          competitionId: competition.id,
+          participantId: participation.id,
+        },
+      });
+
+      const betsOnMe = betsOnParticipant.length;
+      const totalBetsAmount = betsOnParticipant.reduce(
+        (sum, bet) => sum + Number(bet.amount),
+        0,
+      );
+
+      // Потенциальный выигрыш = сумма всех ставок на этого участника
+      const potentialWinning = totalBetsAmount;
+
+      // Определяем место (если соревнование завершено)
+      let place: number | undefined;
+      if (competition.status === CompetitionStatus.FINISHED && competition.winnerId) {
+        place = competition.winnerId === userId ? 1 : undefined;
+      }
+
+      result.push({
+        id: competition.id,
+        title: competition.title,
+        description: competition.description,
+        startDate: competition.startDate,
+        endDate: competition.endDate,
+        status: competition.status,
+        createdAt: competition.createdAt,
+        updatedAt: competition.updatedAt,
+        participantId: participation.id,
+        betsOnMe,
+        totalBetsAmount,
+        potentialWinning,
+        place,
+      });
+    }
+
+    return result;
   }
 
   /**

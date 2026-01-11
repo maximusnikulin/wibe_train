@@ -1,4 +1,4 @@
-import {Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, HttpCode} from '@nestjs/common';
+import {Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, HttpCode, Request} from '@nestjs/common';
 import {ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam} from '@nestjs/swagger';
 import {CompetitionsService} from './competitions.service';
 import {CreateCompetitionDto} from './dto/create-competition.dto';
@@ -29,6 +29,18 @@ export class CompetitionsController {
     @ApiResponse({status: 200, description: 'Список состязаний получен'})
     findAll() {
         return this.competitionsService.findAll();
+    }
+
+    @Get('my-participations')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(UserRole.PARTICIPANT)
+    @ApiBearerAuth('JWT-auth')
+    @ApiOperation({summary: 'Получить состязания текущего участника с статистикой ставок'})
+    @ApiResponse({status: 200, description: 'Список состязаний участника с статистикой'})
+    @ApiResponse({status: 401, description: 'Не авторизован'})
+    @ApiResponse({status: 403, description: 'Доступно только участникам'})
+    getMyParticipations(@Request() req) {
+        return this.competitionsService.findByParticipantWithStats(req.user.id);
     }
 
     @Get('participant/:userId')

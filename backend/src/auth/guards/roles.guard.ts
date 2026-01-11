@@ -20,12 +20,7 @@ export class RolesGuard implements CanActivate {
       throw new ForbiddenException('Доступ запрещён');
     }
 
-    let hasRole = false
-    if (requiredRoles.includes(UserRole.ADMIN)) {
-      hasRole = user.isAdmin
-    } else {
-      hasRole = requiredRoles.includes(user.role);
-    }
+    const hasRole = requiredRoles.includes(user.role);
 
 
     if (!hasRole) {

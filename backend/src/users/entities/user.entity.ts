@@ -49,7 +49,4 @@ export class User {
 
   @OneToMany(() => Transaction, (transaction) => transaction.user)
   transactions: Transaction[];
-
-  @Column({ default: false })
-  isAdmin: false
 }
