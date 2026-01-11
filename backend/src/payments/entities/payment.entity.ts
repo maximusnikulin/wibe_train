@@ -41,8 +41,8 @@ export class Payment {
   @Column({ name: 'transaction_id', nullable: true })
   transactionId: number;
 
-  // Сумма платежа
-  @Column({ type: 'decimal', precision: 10, scale: 2 })
+  // Сумма платежа (целое число, без копеек)
+  @Column({ type: 'int' })
   amount: number;
 
   // Валюта платежа

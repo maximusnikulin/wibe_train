@@ -51,7 +51,7 @@ export class TinkoffMockService {
    */
   async initPayment(amount: number, orderId: string) {
     const paymentId = `mock_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    const paymentUrl = `http://localhost:3001/mock-payment/${paymentId}`;
+    const paymentUrl = `${process.env.FRONTEND_URL}/mock-payment/${paymentId}`;
 
     // Сохраняем данные о платеже
     const paymentData: PaymentData = {
@@ -65,11 +65,6 @@ export class TinkoffMockService {
     this.payments.set(paymentId, paymentData);
 
     this.logger.log(`[MOCK] Инициализирован платёж: ${paymentId}, сумма: ${amount} руб., orderId: ${orderId}`);
-
-    // Автоматически подтверждаем платёж через 5 секунд (имитация оплаты пользователем)
-    setTimeout(() => {
-      this.autoConfirmPayment(paymentId);
-    }, 5000);
 
     return {
       success: true,
@@ -175,25 +170,33 @@ export class TinkoffMockService {
   }
 
   /**
-   * Автоматическое подтверждение платежа (имитация успешной оплаты)
+   * Подтверждение платежа с указанным статусом
+   * @param paymentId - ID платежа
+   * @param status - статус платежа (SUCCESS или FAILED)
    */
-  private autoConfirmPayment(paymentId: string) {
+  confirmPayment(paymentId: string, status: 'SUCCESS' | 'FAILED') {
     const payment = this.payments.get(paymentId);
 
-    if (!payment || payment.status !== 'PENDING') {
-      return;
+    if (!payment) {
+      this.logger.warn(`[MOCK] Платёж не найден: ${paymentId}`);
+      return { success: false, message: 'Payment not found' };
     }
 
-    // Случайно: 90% успех, 10% отклонение
-    const isSuccess = Math.random() > 0.1;
+    if (payment.status !== 'PENDING') {
+      this.logger.warn(`[MOCK] Платёж уже обработан: ${paymentId}, статус: ${payment.status}`);
+      return { success: false, message: 'Payment already processed' };
+    }
 
-    payment.status = isSuccess ? 'SUCCESS' : 'FAILED';
+    payment.status = status;
     this.payments.set(paymentId, payment);
 
-    this.logger.log(`[MOCK] Платёж автоматически ${isSuccess ? 'подтверждён' : 'отклонён'}: ${paymentId}`);
+    const isSuccess = status === 'SUCCESS';
+    this.logger.log(`[MOCK] Платёж ${isSuccess ? 'подтверждён' : 'отклонён'}: ${paymentId}`);
 
     // Имитируем отправку webhook
     this.simulateWebhook(paymentId, payment.status);
+
+    return { success: true, status: payment.status };
   }
 
   /**

@@ -25,12 +25,12 @@ export class Transaction {
   })
   type: TransactionType;
 
-  // Сумма транзакции (в копейках)
-  @Column({ type: 'bigint' })
+  // Сумма транзакции (целое число, без копеек)
+  @Column({ type: 'int' })
   amount: number;
 
-  // Баланс после транзакции
-  @Column({ type: 'bigint' })
+  // Баланс после транзакции (целое число, без копеек)
+  @Column({ type: 'int' })
   balanceAfter: number;
 
   // Описание транзакции

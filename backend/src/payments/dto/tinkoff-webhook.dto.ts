@@ -1,4 +1,4 @@
-import { IsString, IsNumber, IsEnum, IsOptional } from 'class-validator';
+import {IsString, IsNumber, IsEnum, IsOptional, IsDate, IsDateString} from 'class-validator';
 
 export enum TinkoffWebhookStatus {
   SUCCESS = 'SUCCESS',
@@ -26,4 +26,8 @@ export class TinkoffWebhookDto {
   @IsString()
   @IsOptional()
   error_message?: string;
+
+  @IsDateString()
+  @IsOptional()
+  timestamp?: string;
 }

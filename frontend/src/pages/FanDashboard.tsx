@@ -26,7 +26,7 @@ function DepositModal({ isOpen, onClose }: DepositModalProps) {
     },
     onSuccess: (data) => {
       // Редирект на payment_url
-      window.location.href = data.payment_url;
+      window.open(data.payment_url, '_blank');
     },
     onError: (err: any) => {
       setError(err.response?.data?.message || 'Ошибка при создании платежа');
@@ -36,9 +36,9 @@ function DepositModal({ isOpen, onClose }: DepositModalProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    const amountNum = parseInt(amount) * 100; // Конвертируем в копейки
+    const amountNum = parseInt(amount); // Конвертируем в копейки
 
-    if (!amount || amountNum < 10000) {
+    if (!amount || amountNum < 100) {
       setError('Минимальная сумма пополнения: 100₽');
       return;
     }

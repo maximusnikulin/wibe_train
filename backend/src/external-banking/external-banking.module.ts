@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { HttpModule } from '@nestjs/axios';
 import { TinkoffMockService } from './tinkoff-mock.service';
+import { ExternalBankingController } from './external-banking.controller';
 
 /**
  * Модуль для внешних банковских сервисов
@@ -13,6 +14,7 @@ import { TinkoffMockService } from './tinkoff-mock.service';
       maxRedirects: 5,
     }),
   ],
+  controllers: [ExternalBankingController],
   providers: [TinkoffMockService],
   exports: [TinkoffMockService],
 })

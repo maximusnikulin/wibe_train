@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import api from '../services/api';
 
 export function MockPayment() {
   const { paymentId } = useParams<{ paymentId: string }>();
-  const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState('');
 
@@ -13,8 +12,10 @@ export function MockPayment() {
     setError('');
 
     try {
-      await api.post(`/payments/${paymentId}/mock`, { success });
-      navigate('/dashboard');
+      await api.post(`/external-banking/${paymentId}/complete`, {
+        status: success ? 'Success' : 'Failed'
+      });
+      window.close()
     } catch (err) {
       setError('Payment processing failed');
     } finally {

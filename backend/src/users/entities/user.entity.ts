@@ -33,8 +33,8 @@ export class User {
   })
   role: UserRole;
 
-  // Баланс пользователя (в копейках для точности)
-  @Column({ type: 'bigint', default: 0 })
+  // Баланс пользователя (целое число, без копеек)
+  @Column({ type: 'int', default: 0 })
   balance: number;
 
   @CreateDateColumn()
