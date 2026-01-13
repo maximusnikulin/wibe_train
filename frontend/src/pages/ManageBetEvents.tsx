@@ -179,11 +179,12 @@ export function ManageBetEvents() {
     setError('');
     setSuccess('');
 
+    const startDate = new Date(formData.startDate).toISOString()
     const submitData = {
       title: formData.title,
       description: formData.description,
-      startDate: new Date(formData.startDate).toISOString(),
-      endDate: formData.endDate ? new Date(formData.endDate).toISOString() : undefined,
+      startDate,
+      endDate: formData.endDate ? new Date(formData.endDate).toISOString() : startDate,
       status: formData.status,
       participantsIds: formData.participantsIds,
     };
