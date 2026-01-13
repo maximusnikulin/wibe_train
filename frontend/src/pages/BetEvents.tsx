@@ -24,7 +24,7 @@ export function BetEvents() {
     <div className="bet-events-page">
       <header className="header">
         <h1>События</h1>
-        <Link to="/dashboard" className="btn btn-secondary">
+        <Link to="/" className="btn btn-secondary">
           Back to Dashboard
         </Link>
       </header>

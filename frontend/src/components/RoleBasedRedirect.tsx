@@ -17,6 +17,10 @@ export function RoleBasedRedirect() {
     return <Navigate to="/participant-dashboard" replace />;
   }
 
+  if (user.role === 'admin') {
+    return <Navigate to="/admin-dashboard" replace />;
+  }
+
   // Default to fan dashboard (for 'fan' role or any other)
   return <Navigate to="/fan-dashboard" replace />;
 }

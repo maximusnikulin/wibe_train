@@ -11,15 +11,6 @@ import { UserRole } from './entities/user.entity';
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
-  // Публичный эндпоинт - получить профиль пользователя по ID
-  @Get(':id')
-  @ApiOperation({ summary: 'Получить публичный профиль пользователя' })
-  @ApiResponse({ status: 200, description: 'Профиль получен' })
-  @ApiResponse({ status: 404, description: 'Пользователь не найден' })
-  async getPublicProfile(@Param('id') id: string) {
-    return this.usersService.getPublicProfile(+id);
-  }
-
   @Get('balance')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('JWT-auth')
@@ -54,5 +45,15 @@ export class UsersController {
   @ApiResponse({ status: 403, description: 'Доступно только админу' })
   async getParticipants() {
     return this.usersService.findParticipants();
+  }
+
+  // Публичный эндпоинт - получить профиль пользователя по ID
+  // ВАЖНО: этот роут должен быть последним, так как :id перехватывает все
+  @Get(':id')
+  @ApiOperation({ summary: 'Получить публичный профиль пользователя' })
+  @ApiResponse({ status: 200, description: 'Профиль получен' })
+  @ApiResponse({ status: 404, description: 'Пользователь не найден' })
+  async getPublicProfile(@Param('id') id: string) {
+    return this.usersService.getPublicProfile(+id);
   }
 }

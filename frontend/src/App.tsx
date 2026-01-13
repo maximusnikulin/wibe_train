@@ -14,6 +14,7 @@ import { MockPayment } from './pages/MockPayment';
 import { NotFound } from './pages/NotFound';
 import { ManageBetEvents } from './pages/ManageBetEvents';
 import { UserProfile } from './pages/UserProfile';
+import { AdminDashboard } from './pages/AdminDashboard';
 import './App.css';
 
 const queryClient = new QueryClient({
@@ -33,14 +34,6 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/register" element={<Register />} />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <RoleBasedRedirect />
-                </ProtectedRoute>
-              }
-            />
             <Route
               path="/fan-dashboard"
               element={
@@ -83,6 +76,16 @@ function App() {
                 <ProtectedRoute>
                   <RoleProtectedRoute allowedRoles={['admin']}>
                     <ManageBetEvents />
+                  </RoleProtectedRoute>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin-dashboard"
+              element={
+                <ProtectedRoute>
+                  <RoleProtectedRoute allowedRoles={['admin']}>
+                    <AdminDashboard />
                   </RoleProtectedRoute>
                 </ProtectedRoute>
               }

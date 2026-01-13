@@ -18,6 +18,10 @@ export function Home() {
     return <Navigate to="/participant-dashboard" replace />;
   }
 
+  if (user.role === 'admin') {
+    return <Navigate to="/admin-dashboard" replace />;
+  }
+
   // Для fan и admin редиректим на fan-dashboard
   return <Navigate to="/fan-dashboard" replace />;
 }
