@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, UseGuards, Request, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -8,12 +8,21 @@ import { UserRole } from './entities/user.entity';
 
 @ApiTags('users')
 @Controller('users')
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth('JWT-auth')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
+
+  // Публичный эндпоинт - получить профиль пользователя по ID
+  @Get(':id')
+  @ApiOperation({ summary: 'Получить публичный профиль пользователя' })
+  @ApiResponse({ status: 200, description: 'Профиль получен' })
+  @ApiResponse({ status: 404, description: 'Пользователь не найден' })
+  async getPublicProfile(@Param('id') id: string) {
+    return this.usersService.getPublicProfile(+id);
+  }
 
   @Get('balance')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Получить баланс текущего пользователя' })
   @ApiResponse({ status: 200, description: 'Баланс получен' })
   @ApiResponse({ status: 401, description: 'Не авторизован' })
@@ -22,6 +31,8 @@ export class UsersController {
   }
 
   @Get('me')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Получить профиль текущего пользователя' })
   @ApiResponse({ status: 200, description: 'Профиль получен' })
   @ApiResponse({ status: 401, description: 'Не авторизован' })
@@ -34,7 +45,8 @@ export class UsersController {
   }
 
   @Get('participants')
-  @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @ApiBearerAuth('JWT-auth')
   @Roles(UserRole.ADMIN)
   @ApiOperation({ summary: 'Получить список всех участников (только для админа)' })
   @ApiResponse({ status: 200, description: 'Список участников получен' })

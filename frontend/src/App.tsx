@@ -13,6 +13,7 @@ import { BetEventDetails } from './pages/BetEventDetails';
 import { MockPayment } from './pages/MockPayment';
 import { NotFound } from './pages/NotFound';
 import { ManageBetEvents } from './pages/ManageBetEvents';
+import { UserProfile } from './pages/UserProfile';
 import './App.css';
 
 const queryClient = new QueryClient({
@@ -87,6 +88,7 @@ function App() {
               }
             />
             <Route path="/mock-payment/:paymentId" element={<MockPayment />} />
+            <Route path="/users/:id" element={<UserProfile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

@@ -8,7 +8,7 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-  ) {}
+  ) { }
 
   // Получить пользователя по ID
   async findOne(id: number): Promise<User> {
@@ -54,5 +54,14 @@ export class UsersService {
       where: { role: UserRole.PARTICIPANT },
       select: ['id', 'email', 'firstName', 'lastName', 'role'],
     });
+  }
+
+  // Получить публичный профиль пользователя
+  async getPublicProfile(id: number): Promise<{ firstName: string; lastName: string }> {
+    const user = await this.findOne(id);
+    return {
+      firstName: user.firstName,
+      lastName: user.lastName,
+    };
   }
 }
