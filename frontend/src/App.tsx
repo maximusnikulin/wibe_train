@@ -12,6 +12,7 @@ import { BetEvents } from './pages/BetEvents';
 import { BetEventDetails } from './pages/BetEventDetails';
 import { MockPayment } from './pages/MockPayment';
 import { NotFound } from './pages/NotFound';
+import { ManageBetEvents } from './pages/ManageBetEvents';
 import './App.css';
 
 const queryClient = new QueryClient({
@@ -72,6 +73,16 @@ function App() {
               element={
                 <ProtectedRoute>
                   <BetEventDetails />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/manage-events"
+              element={
+                <ProtectedRoute>
+                  <RoleProtectedRoute allowedRoles={['admin']}>
+                    <ManageBetEvents />
+                  </RoleProtectedRoute>
                 </ProtectedRoute>
               }
             />

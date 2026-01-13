@@ -15,7 +15,7 @@ export interface BetEvent {
   description: string;
   startDate: string;
   endDate: string;
-  status: 'upcoming' | 'active' | 'completed' | 'cancelled';
+  status: 'upcoming' | 'active' | 'finished' | 'cancelled';
   createdAt: string;
   updatedAt: string;
 }
