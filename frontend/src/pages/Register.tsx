@@ -21,7 +21,7 @@ export function Register() {
 
     try {
       await register({ email, password, firstName, lastName, role });
-      navigate('/dashboard');
+      navigate('/');
     } catch (err) {
       setError('Registration failed. Please try again.');
     } finally {
