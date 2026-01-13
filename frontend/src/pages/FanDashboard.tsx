@@ -142,7 +142,7 @@ export function FanDashboard() {
 
     const matchesSearch =
       !searchQuery ||
-      bet.competition?.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      bet.betEvent?.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       bet.participant?.user?.firstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       bet.participant?.user?.lastName?.toLowerCase().includes(searchQuery.toLowerCase());
 
@@ -165,7 +165,7 @@ export function FanDashboard() {
         try {
           const response = await api.get(`/payments/${paymentId}/status`);
           const payment = response.data;
-          
+
           if (payment.status === 'completed') {
             setToast({ message: 'Баланс успешно пополнен!', type: 'success' });
             refetchBalance();
@@ -247,8 +247,8 @@ export function FanDashboard() {
           <span className="user-name">{user?.firstName} {user?.lastName}</span>
         </div>
         <nav className="header-nav">
-          <Link to="/competitions" className="nav-link">
-            СОСТЯЗАНИЯ
+          <Link to="/bet-events" className="nav-link">
+            СОБЫТИЯ
           </Link>
           <button onClick={logout} className="btn btn-secondary">
             ВЫХОД
@@ -340,7 +340,7 @@ export function FanDashboard() {
               {filteredBets.map((bet) => (
                 <div key={bet.id} className="bet-card">
                   <div className="bet-header">
-                    <h3>{bet.competition?.title || 'Состязание'}</h3>
+                    <h3>{bet.betEvent?.title || 'Событие'}</h3>
                     <span className={`bet-status bet-status-${bet.status}`}>
                       {bet.status === 'pending' && 'ОЖИДАНИЕ'}
                       {bet.status === 'won' && 'ВЫИГРАНО'}
@@ -367,10 +367,10 @@ export function FanDashboard() {
                     </div>
                   </div>
                   <Link
-                    to={`/competitions/${bet.competitionId}`}
+                    to={`/bet-events/${bet.betEventId}`}
                     className="bet-link"
                   >
-                    ПЕРЕЙТИ К СОСТЯЗАНИЮ →
+                    ПЕРЕЙТИ К СОБЫТИЮ →
                   </Link>
                 </div>
               ))}

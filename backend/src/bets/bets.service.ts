@@ -4,9 +4,9 @@ import { Repository } from 'typeorm';
 import { Bet, BetStatus } from './entities/bet.entity';
 import { CreateBetDto } from './dto/create-bet.dto';
 import { UsersService } from '../users/users.service';
-import { CompetitionsService } from '../competitions/competitions.service';
+import { BetEventsService } from '../bet-events/bet-events.service';
 import { TransactionsService } from '../transactions/transactions.service';
-import { CompetitionStatus } from '../competitions/entities/competition.entity';
+import { BetEventStatus } from '../bet-events/entities/bet-event.entity';
 
 @Injectable()
 export class BetsService {
@@ -14,26 +14,26 @@ export class BetsService {
     @InjectRepository(Bet)
     private betsRepository: Repository<Bet>,
     private usersService: UsersService,
-    @Inject(forwardRef(() => CompetitionsService))
-    private competitionsService: CompetitionsService,
+    @Inject(forwardRef(() => BetEventsService))
+    private betEventsService: BetEventsService,
     @Inject(forwardRef(() => TransactionsService))
     private transactionsService: TransactionsService,
   ) {}
 
   // Создать ставку
   async create(userId: number, createBetDto: CreateBetDto): Promise<Bet> {
-    const { competitionId, participantId, amount } = createBetDto;
+    const { betEventId, participantId, amount } = createBetDto;
 
-    // Проверяем существование состязания
-    const competition = await this.competitionsService.findOne(competitionId);
+    // Проверяем существование события
+    const betEvent = await this.betEventsService.findOne(betEventId);
 
-    // Проверяем, что состязание ещё не началось или активно
-    if (competition.status === CompetitionStatus.FINISHED || competition.status === CompetitionStatus.CANCELLED) {
-      throw new BadRequestException('Ставки на это состязание больше не принимаются');
+    // Проверяем, что событие ещё не началось или активно
+    if (betEvent.status === BetEventStatus.FINISHED || betEvent.status === BetEventStatus.CANCELLED) {
+      throw new BadRequestException('Ставки на это событие больше не принимаются');
     }
 
     // Проверяем существование участника
-    const participants = await this.competitionsService.getParticipants(competitionId);
+    const participants = await this.betEventsService.getParticipants(betEventId);
     const participant = participants.find((p) => p.id === participantId);
 
     if (!participant) {
@@ -52,7 +52,7 @@ export class BetsService {
     // Создаём ставку
     const bet = this.betsRepository.create({
       userId,
-      competitionId,
+      betEventId,
       participantId,
       amount,
       status: BetStatus.PENDING,
@@ -70,7 +70,7 @@ export class BetsService {
   async findByUser(userId: number): Promise<Bet[]> {
     return this.betsRepository.find({
       where: { userId },
-      relations: ['competition', 'participant', 'participant.user'],
+      relations: ['betEvent', 'participant', 'participant.user'],
       order: { createdAt: 'DESC' },
     });
   }
@@ -79,7 +79,7 @@ export class BetsService {
   async findOne(id: number): Promise<Bet> {
     const bet = await this.betsRepository.findOne({
       where: { id },
-      relations: ['competition', 'participant', 'participant.user'],
+      relations: ['betEvent', 'participant', 'participant.user'],
     });
 
     if (!bet) {
@@ -89,11 +89,11 @@ export class BetsService {
     return bet;
   }
 
-  // Обработать результаты состязания (вызывается при установке победителя)
-  async processCompetitionResults(competitionId: number, winnerId: number): Promise<void> {
-    // Находим все ставки на это состязание
+  // Обработать результаты события (вызывается при установке победителя)
+  async processBetEventResults(betEventId: number, winnerId: number): Promise<void> {
+    // Находим все ставки на это событие
     const bets = await this.betsRepository.find({
-      where: { competitionId, status: BetStatus.PENDING },
+      where: { betEventId, status: BetStatus.PENDING },
       relations: ['participant'],
     });
 

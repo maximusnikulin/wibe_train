@@ -1,14 +1,14 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn } from 'typeorm';
-import { Competition } from './competition.entity';
+import { BetEvent } from './bet-event.entity';
 import { User } from '../../users/entities/user.entity';
 
-@Entity('competition_participants')
-export class CompetitionParticipant {
+@Entity('bet_event_participants')
+export class BetEventParticipant {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  competitionId: number;
+  betEventId: number;
 
   @Column()
   userId: number;
@@ -21,9 +21,9 @@ export class CompetitionParticipant {
   createdAt: Date;
 
   // Связи
-  @ManyToOne(() => Competition, (competition) => competition.participants, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'competitionId' })
-  competition: Competition;
+  @ManyToOne(() => BetEvent, (betEvent) => betEvent.participants, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'betEventId' })
+  betEvent: BetEvent;
 
   @ManyToOne(() => User, { eager: true })
   @JoinColumn({ name: 'userId' })

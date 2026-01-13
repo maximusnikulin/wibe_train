@@ -8,8 +8,8 @@ import { Home } from './pages/Home';
 import { Register } from './pages/Register';
 import { FanDashboard } from './pages/FanDashboard';
 import { ParticipantDashboard } from './pages/ParticipantDashboard';
-import { Competitions } from './pages/Competitions';
-import { CompetitionDetails } from './pages/CompetitionDetails';
+import { BetEvents } from './pages/BetEvents';
+import { BetEventDetails } from './pages/BetEventDetails';
 import { MockPayment } from './pages/MockPayment';
 import { NotFound } from './pages/NotFound';
 import './App.css';
@@ -60,18 +60,18 @@ function App() {
               }
             />
             <Route
-              path="/competitions"
+              path="/bet-events"
               element={
                 <ProtectedRoute>
-                  <Competitions />
+                  <BetEvents />
                 </ProtectedRoute>
               }
             />
             <Route
-              path="/competitions/:id"
+              path="/bet-events/:id"
               element={
                 <ProtectedRoute>
-                  <CompetitionDetails />
+                  <BetEventDetails />
                 </ProtectedRoute>
               }
             />

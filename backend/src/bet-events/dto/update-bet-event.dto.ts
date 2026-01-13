@@ -1,11 +1,11 @@
 import { IsString, IsDateString, IsEnum, IsOptional, IsNumber, IsArray } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { CompetitionStatus } from '../entities/competition.entity';
+import { BetEventStatus } from '../entities/bet-event.entity';
 
-export class UpdateCompetitionDto {
+export class UpdateBetEventDto {
   @ApiProperty({
     example: 'Чемпионат мира по футболу',
-    description: 'Название состязания',
+    description: 'Название события',
     required: false
   })
   @IsString()
@@ -13,8 +13,8 @@ export class UpdateCompetitionDto {
   title?: string;
 
   @ApiProperty({
-    example: 'Международное состязание по футболу',
-    description: 'Описание состязания',
+    example: 'Международное событие по футболу',
+    description: 'Описание события',
     required: false
   })
   @IsString()
@@ -22,18 +22,18 @@ export class UpdateCompetitionDto {
   description?: string;
 
   @ApiProperty({
-    enum: CompetitionStatus,
-    example: CompetitionStatus.ACTIVE,
-    description: 'Статус состязания',
+    enum: BetEventStatus,
+    example: BetEventStatus.ACTIVE,
+    description: 'Статус события',
     required: false
   })
-  @IsEnum(CompetitionStatus)
+  @IsEnum(BetEventStatus)
   @IsOptional()
-  status?: CompetitionStatus;
+  status?: BetEventStatus;
 
   @ApiProperty({
     example: '2024-12-01',
-    description: 'Дата начала состязания',
+    description: 'Дата начала события',
     required: false
   })
   @IsDateString()
@@ -42,7 +42,7 @@ export class UpdateCompetitionDto {
 
   @ApiProperty({
     example: '2024-12-31',
-    description: 'Дата окончания состязания',
+    description: 'Дата окончания события',
     required: false
   })
   @IsDateString()
@@ -51,7 +51,7 @@ export class UpdateCompetitionDto {
 
   @ApiProperty({
     example: 5,
-    description: 'ID победителя состязания',
+    description: 'ID победителя события',
     required: false
   })
   @IsNumber()

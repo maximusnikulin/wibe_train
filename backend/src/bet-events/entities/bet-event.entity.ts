@@ -1,17 +1,17 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
-import { CompetitionParticipant } from './competition-participant.entity';
+import { BetEventParticipant } from './bet-event-participant.entity';
 import { Bet } from '../../bets/entities/bet.entity';
 
-// Статус состязания
-export enum CompetitionStatus {
+// Статус события
+export enum BetEventStatus {
   UPCOMING = 'upcoming', // Предстоящее
   ACTIVE = 'active', // Активное (идёт)
   FINISHED = 'finished', // Завершённое
   CANCELLED = 'cancelled', // Отменённое
 }
 
-@Entity('competitions')
-export class Competition {
+@Entity('bet_events')
+export class BetEvent {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -23,10 +23,10 @@ export class Competition {
 
   @Column({
     type: 'enum',
-    enum: CompetitionStatus,
-    default: CompetitionStatus.UPCOMING,
+    enum: BetEventStatus,
+    default: BetEventStatus.UPCOMING,
   })
-  status: CompetitionStatus;
+  status: BetEventStatus;
 
   @Column({ type: 'datetime' })
   startDate: Date;
@@ -45,9 +45,9 @@ export class Competition {
   updatedAt: Date;
 
   // Связи
-  @OneToMany(() => CompetitionParticipant, (participant) => participant.competition)
-  participants: CompetitionParticipant[];
+  @OneToMany(() => BetEventParticipant, (participant) => participant.betEvent)
+  participants: BetEventParticipant[];
 
-  @OneToMany(() => Bet, (bet) => bet.competition)
+  @OneToMany(() => Bet, (bet) => bet.betEvent)
   bets: Bet[];
 }

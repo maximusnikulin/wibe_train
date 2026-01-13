@@ -9,7 +9,7 @@ export interface User {
   balance: string;
 }
 
-export interface Competition {
+export interface BetEvent {
   id: number;
   title: string;
   description: string;
@@ -23,13 +23,13 @@ export interface Competition {
 export interface Bet {
   id: number;
   userId: number;
-  competitionId: number;
+  betEventId: number;
   participantId: number;
   amount: number;
   status: 'pending' | 'won' | 'lost' | 'cancelled';
   createdAt: string;
   updatedAt: string;
-  competition?: Competition;
+  betEvent?: BetEvent;
   participant?: {
     id: number;
     userId: number;

@@ -132,7 +132,7 @@
 }
 
 /* Sections */
-.competitions-section,
+.bet-events-section,
 .transactions-section {
   background-color: white;
   border-radius: 0.5rem;
@@ -189,40 +189,40 @@
   border-color: #3b82f6;
 }
 
-/* Competitions Grid */
-.competitions-grid {
+/* Bet Events Grid */
+.bet-events-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 1.5rem;
 }
 
-.competition-card {
+.bet-event-card {
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
   padding: 1.5rem;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.competition-card:hover {
+.bet-event-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.competition-header {
+.bet-event-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 1rem;
 }
 
-.competition-header h3 {
+.bet-event-header h3 {
   margin: 0;
   font-size: 1.125rem;
   color: #1f2937;
   flex: 1;
 }
 
-.competition-status {
+.bet-event-status {
   padding: 0.25rem 0.75rem;
   border-radius: 9999px;
   font-size: 0.75rem;
@@ -250,14 +250,14 @@
   color: #4b5563;
 }
 
-.competition-info {
+.bet-event-info {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   margin-bottom: 1rem;
 }
 
-.competition-detail {
+.bet-event-detail {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -285,7 +285,7 @@
   font-weight: 700;
 }
 
-.competition-link {
+.bet-event-link {
   display: inline-block;
   color: #3b82f6;
   text-decoration: none;
@@ -294,7 +294,7 @@
   margin-top: 0.5rem;
 }
 
-.competition-link:hover {
+.bet-event-link:hover {
   text-decoration: underline;
 }
 
@@ -653,7 +653,7 @@
     flex-direction: column;
   }
 
-  .competitions-grid {
+  .bet-events-grid {
     grid-template-columns: 1fr;
   }
 

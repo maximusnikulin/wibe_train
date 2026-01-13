@@ -1,7 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-import { Competition } from '../../competitions/entities/competition.entity';
-import { CompetitionParticipant } from '../../competitions/entities/competition-participant.entity';
+import { BetEvent } from '../../bet-events/entities/bet-event.entity';
+import { BetEventParticipant } from '../../bet-events/entities/bet-event-participant.entity';
 
 // Статус ставки
 export enum BetStatus {
@@ -20,7 +20,7 @@ export class Bet {
   userId: number;
 
   @Column()
-  competitionId: number;
+  betEventId: number;
 
   @Column()
   participantId: number;
@@ -47,11 +47,11 @@ export class Bet {
   @JoinColumn({ name: 'userId' })
   user: User;
 
-  @ManyToOne(() => Competition, (competition) => competition.bets)
-  @JoinColumn({ name: 'competitionId' })
-  competition: Competition;
+  @ManyToOne(() => BetEvent, (betEvent) => betEvent.bets)
+  @JoinColumn({ name: 'betEventId' })
+  betEvent: BetEvent;
 
-  @ManyToOne(() => CompetitionParticipant, { eager: true })
+  @ManyToOne(() => BetEventParticipant, { eager: true })
   @JoinColumn({ name: 'participantId' })
-  participant: CompetitionParticipant;
+  participant: BetEventParticipant;
 }

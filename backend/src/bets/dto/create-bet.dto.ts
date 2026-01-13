@@ -2,8 +2,8 @@ import { IsNumber, IsPositive, Min } from 'class-validator';
 
 export class CreateBetDto {
   @IsNumber()
-  @IsPositive({ message: 'ID состязания должен быть положительным числом' })
-  competitionId: number;
+  @IsPositive({ message: 'ID события должен быть положительным числом' })
+  betEventId: number;
 
   @IsNumber()
   @IsPositive({ message: 'ID участника должен быть положительным числом' })

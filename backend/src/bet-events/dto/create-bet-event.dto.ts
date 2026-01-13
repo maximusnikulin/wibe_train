@@ -1,44 +1,44 @@
 import { IsString, IsNotEmpty, IsDateString, IsEnum, IsOptional, IsArray, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { CompetitionStatus } from '../entities/competition.entity';
+import { BetEventStatus } from '../entities/bet-event.entity';
 
-export class CreateCompetitionDto {
+export class CreateBetEventDto {
   @ApiProperty({
     example: 'Чемпионат мира по футболу',
-    description: 'Название состязания'
+    description: 'Название события'
   })
   @IsString()
-  @IsNotEmpty({ message: 'Название состязания обязательно' })
+  @IsNotEmpty({ message: 'Название события обязательно' })
   title: string;
 
   @ApiProperty({
-    example: 'Международное состязание по футболу',
-    description: 'Описание состязания'
+    example: 'Международное событие по футболу',
+    description: 'Описание события'
   })
   @IsString()
-  @IsNotEmpty({ message: 'Описание состязания обязательно' })
+  @IsNotEmpty({ message: 'Описание события обязательно' })
   description: string;
 
   @ApiProperty({
-    enum: CompetitionStatus,
-    example: CompetitionStatus.UPCOMING,
-    description: 'Статус состязания',
+    enum: BetEventStatus,
+    example: BetEventStatus.UPCOMING,
+    description: 'Статус события',
     required: false
   })
-  @IsEnum(CompetitionStatus, { message: 'Некорректный статус состязания' })
+  @IsEnum(BetEventStatus, { message: 'Некорректный статус события' })
   @IsOptional()
-  status?: CompetitionStatus;
+  status?: BetEventStatus;
 
   @ApiProperty({
     example: '2024-12-01',
-    description: 'Дата начала состязания (ISO 8601)'
+    description: 'Дата начала события (ISO 8601)'
   })
   @IsDateString({}, { message: 'Некорректная дата начала' })
   startDate: string;
 
   @ApiProperty({
     example: '2024-12-31',
-    description: 'Дата окончания состязания (ISO 8601)',
+    description: 'Дата окончания события (ISO 8601)',
     required: false
   })
   @IsDateString({}, { message: 'Некорректная дата окончания' })

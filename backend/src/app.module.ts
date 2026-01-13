@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
-import { CompetitionsModule } from './competitions/competitions.module';
+import { BetEventsModule } from './bet-events/bet-events.module';
 import { BetsModule } from './bets/bets.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { ExternalBankingModule } from './external-banking/external-banking.module';
@@ -37,7 +37,7 @@ import { PaymentModule } from './payments/payment.module';
     // Подключаем все модули приложения
     AuthModule,
     UsersModule,
-    CompetitionsModule,
+    BetEventsModule,
     BetsModule,
     TransactionsModule,
     ExternalBankingModule,

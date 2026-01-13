@@ -25,11 +25,11 @@ async function bootstrap() {
   // Настройка Swagger документации
   const config = new DocumentBuilder()
     .setTitle('Betting System API')
-    .setDescription('API для системы ставок на спортивные состязания')
+    .setDescription('API для системы ставок на спортивные события')
     .setVersion('1.0')
     .addTag('auth', 'Авторизация и регистрация')
     .addTag('users', 'Управление пользователями')
-    .addTag('competitions', 'Управление состязаниями')
+    .addTag('bet-events', 'Управление событиями на которые можно поставить')
     .addTag('bets', 'Управление ставками')
     .addTag('transactions', 'История транзакций')
     .addTag('payments', 'Платежи и выплаты')

@@ -3,14 +3,14 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
-import { Transaction, Competition } from '../types';
+import { Transaction, BetEvent } from '../types';
 import './ParticipantDashboard.css';
 
 interface BalanceResponse {
   balance: string;
 }
 
-interface ParticipantCompetition extends Competition {
+interface ParticipantBetEvent extends BetEvent {
   participantId: number;
   betsOnMe: number;
   totalBetsAmount: number;
@@ -223,7 +223,7 @@ export function ParticipantDashboard() {
     message: string;
     type: 'success' | 'error';
   } | null>(null);
-  const [competitionFilter, setCompetitionFilter] = useState<
+  const [betEventFilter, setBetEventFilter] = useState<
     'all' | 'active' | 'completed'
   >('all');
 
@@ -238,13 +238,13 @@ export function ParticipantDashboard() {
       refetchInterval: 5000,
     });
 
-  // Получение состязаний участника
-  const { data: competitions, isLoading: competitionsLoading } = useQuery<
-    ParticipantCompetition[]
+  // Получение событий участника
+  const { data: betEvents, isLoading: betEventsLoading } = useQuery<
+    ParticipantBetEvent[]
   >({
-    queryKey: ['participant-competitions'],
+    queryKey: ['participant-bet-events'],
     queryFn: async () => {
-      const response = await api.get('/competitions/my-participations');
+      const response = await api.get('/bet-events/my-participations');
       return response.data;
     },
   });
@@ -260,24 +260,24 @@ export function ParticipantDashboard() {
     },
   });
 
-  // Фильтрация состязаний
-  const filteredCompetitions = competitions?.filter((comp) => {
-    if (competitionFilter === 'all') return true;
-    if (competitionFilter === 'active')
-      return comp.status === 'active' || comp.status === 'upcoming';
-    if (competitionFilter === 'completed')
-      return comp.status === 'completed' || comp.status === 'cancelled';
+  // Фильтрация событий
+  const filteredBetEvents = betEvents?.filter((event) => {
+    if (betEventFilter === 'all') return true;
+    if (betEventFilter === 'active')
+      return event.status === 'active' || event.status === 'upcoming';
+    if (betEventFilter === 'completed')
+      return event.status === 'completed' || event.status === 'cancelled';
     return true;
   });
 
   // Статистика
-  const activeCompetitions =
-    competitions?.filter(
+  const activeBetEvents =
+    betEvents?.filter(
       (c) => c.status === 'active' || c.status === 'upcoming'
     ) || [];
-  const completedCompetitions =
-    competitions?.filter((c) => c.status === 'completed') || [];
-  const wins = completedCompetitions.filter((c) => c.place === 1).length;
+  const completedBetEvents =
+    betEvents?.filter((c) => c.status === 'completed') || [];
+  const wins = completedBetEvents.filter((c) => c.place === 1).length;
   const totalEarnings =
     transactions
       ?.filter((t) => t.type === 'winning')
@@ -290,7 +290,7 @@ export function ParticipantDashboard() {
 
   const balance = Number(balanceData?.balance || user?.balance || 0);
 
-  const getStatusLabel = (status: Competition['status']) => {
+  const getStatusLabel = (status: BetEvent['status']) => {
     switch (status) {
       case 'upcoming':
         return 'СКОРО';
@@ -342,8 +342,8 @@ export function ParticipantDashboard() {
           </span>
         </div>
         <nav className="header-nav">
-          <Link to="/competitions" className="nav-link">
-            СОСТЯЗАНИЯ
+          <Link to="/bet-events" className="nav-link">
+            СОБЫТИЯ
           </Link>
           <button onClick={logout} className="btn btn-secondary">
             ВЫХОД
@@ -367,15 +367,15 @@ export function ParticipantDashboard() {
             </button>
           </div>
 
-          {/* Статистика состязаний */}
+          {/* Статистика событий */}
           <div className="stats-widget">
             <div className="stat-item">
-              <div className="stat-label">АКТИВНЫЕ СОСТЯЗАНИЯ</div>
-              <div className="stat-value">{activeCompetitions.length}</div>
+              <div className="stat-label">АКТИВНЫЕ СОБЫТИЯ</div>
+              <div className="stat-value">{activeBetEvents.length}</div>
             </div>
             <div className="stat-item">
               <div className="stat-label">ЗАВЕРШЁННЫЕ</div>
-              <div className="stat-value">{completedCompetitions.length}</div>
+              <div className="stat-value">{completedBetEvents.length}</div>
             </div>
             <div className="stat-item">
               <div className="stat-label">ПОБЕД</div>
@@ -388,27 +388,27 @@ export function ParticipantDashboard() {
           </div>
         </div>
 
-        {/* Мои состязания */}
-        <section className="competitions-section">
+        {/* Мои события */}
+        <section className="bet-events-section">
           <div className="section-header">
-            <h2>МОИ СОСТЯЗАНИЯ</h2>
+            <h2>МОИ СОБЫТИЯ</h2>
             <div className="section-controls">
               <div className="filter-buttons">
                 <button
-                  className={`filter-btn ${competitionFilter === 'all' ? 'active' : ''}`}
-                  onClick={() => setCompetitionFilter('all')}
+                  className={`filter-btn ${betEventFilter === 'all' ? 'active' : ''}`}
+                  onClick={() => setBetEventFilter('all')}
                 >
                   ВСЕ
                 </button>
                 <button
-                  className={`filter-btn ${competitionFilter === 'active' ? 'active' : ''}`}
-                  onClick={() => setCompetitionFilter('active')}
+                  className={`filter-btn ${betEventFilter === 'active' ? 'active' : ''}`}
+                  onClick={() => setBetEventFilter('active')}
                 >
                   АКТИВНЫЕ
                 </button>
                 <button
-                  className={`filter-btn ${competitionFilter === 'completed' ? 'active' : ''}`}
-                  onClick={() => setCompetitionFilter('completed')}
+                  className={`filter-btn ${betEventFilter === 'completed' ? 'active' : ''}`}
+                  onClick={() => setBetEventFilter('completed')}
                 >
                   ЗАВЕРШЁННЫЕ
                 </button>
@@ -416,53 +416,53 @@ export function ParticipantDashboard() {
             </div>
           </div>
 
-          {competitionsLoading ? (
+          {betEventsLoading ? (
             <div className="loading-skeleton">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="skeleton-card"></div>
               ))}
             </div>
-          ) : filteredCompetitions && filteredCompetitions.length > 0 ? (
-            <div className="competitions-grid">
-              {filteredCompetitions.map((comp) => (
-                <div key={comp.id} className="competition-card">
-                  <div className="competition-header">
-                    <h3>{comp.title}</h3>
-                    <span className={`competition-status status-${comp.status}`}>
-                      {getStatusLabel(comp.status)}
+          ) : filteredBetEvents && filteredBetEvents.length > 0 ? (
+            <div className="bet-events-grid">
+              {filteredBetEvents.map((event) => (
+                <div key={event.id} className="bet-event-card">
+                  <div className="bet-event-header">
+                    <h3>{event.title}</h3>
+                    <span className={`bet-event-status status-${event.status}`}>
+                      {getStatusLabel(event.status)}
                     </span>
                   </div>
-                  <div className="competition-info">
-                    <div className="competition-detail">
+                  <div className="bet-event-info">
+                    <div className="bet-event-detail">
                       <span className="detail-label">СТАВОК НА МЕНЯ:</span>
                       <span className="detail-value">
-                        {comp.betsOnMe} ({comp.totalBetsAmount} руб.)
+                        {event.betsOnMe} ({event.totalBetsAmount} руб.)
                       </span>
                     </div>
-                    <div className="competition-detail">
+                    <div className="bet-event-detail">
                       <span className="detail-label">ВОЗМОЖНЫЙ ВЫИГРЫШ:</span>
                       <span className="detail-value potential-win">
-                        {comp.potentialWinning} руб.
+                        {event.potentialWinning} руб.
                       </span>
                     </div>
-                    {comp.place && (
-                      <div className="competition-detail">
+                    {event.place && (
+                      <div className="bet-event-detail">
                         <span className="detail-label">МЕСТО:</span>
                         <span
-                          className={`detail-value ${comp.place === 1 ? 'place-first' : ''}`}
+                          className={`detail-value ${event.place === 1 ? 'place-first' : ''}`}
                         >
-                          {comp.place === 1 ? '1 МЕСТО' : `${comp.place} МЕСТО`}
+                          {event.place === 1 ? '1 МЕСТО' : `${event.place} МЕСТО`}
                         </span>
                       </div>
                     )}
-                    <div className="competition-detail">
+                    <div className="bet-event-detail">
                       <span className="detail-label">ДАТА:</span>
                       <span className="detail-value">
-                        {new Date(comp.startDate).toLocaleDateString('ru-RU')}
+                        {new Date(event.startDate).toLocaleDateString('ru-RU')}
                       </span>
                     </div>
                   </div>
-                  <Link to={`/competitions/${comp.id}`} className="competition-link">
+                  <Link to={`/bet-events/${event.id}`} className="bet-event-link">
                     ПОДРОБНЕЕ →
                   </Link>
                 </div>
@@ -470,7 +470,7 @@ export function ParticipantDashboard() {
             </div>
           ) : (
             <div className="empty-state">
-              <p>НЕТ СОСТЯЗАНИЙ</p>
+              <p>НЕТ СОБЫТИЙ</p>
             </div>
           )}
         </section>
