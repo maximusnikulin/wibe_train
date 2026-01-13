@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import api from '../services/api';
 import { BetEvent } from '../types';
+import { UserMultiselect } from '../components/UserMultiselect';
 
 interface User {
   id: number;
@@ -54,16 +55,7 @@ export function ManageBetEvents() {
     },
   });
 
-  // Получение участников конкретного события
-  const { data: eventParticipants } = useQuery<{ id: number; userId: number }[]>({
-    queryKey: ['eventParticipants', editingEvent?.id],
-    queryFn: async () => {
-      if (!editingEvent) return [];
-      const response = await api.get(`/bet-events/${editingEvent.id}/participants`);
-      return response.data;
-    },
-    enabled: !!editingEvent,
-  });
+
 
   // Создание события
   const createMutation = useMutation({
@@ -143,7 +135,7 @@ export function ManageBetEvents() {
     setShowForm(true);
     setError('');
     setSuccess('');
-    
+
     // Загружаем участников события
     try {
       const response = await api.get(`/bet-events/${event.id}/participants`);
@@ -211,14 +203,6 @@ export function ManageBetEvents() {
     setSuccess('');
   };
 
-  const handleParticipantToggle = (userId: number) => {
-    setFormData(prev => ({
-      ...prev,
-      participantsIds: prev.participantsIds.includes(userId)
-        ? prev.participantsIds.filter(id => id !== userId)
-        : [...prev.participantsIds, userId],
-    }));
-  };
 
   if (eventsLoading || participantsLoading) {
     return <div className="loading">Загрузка...</div>;
@@ -351,28 +335,11 @@ export function ManageBetEvents() {
               <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>
                 Участники
               </label>
-              <div style={{ maxHeight: '200px', overflowY: 'auto', border: '1px solid #ddd', borderRadius: '4px', padding: '0.5rem' }}>
-                {participants && participants.length > 0 ? (
-                  participants.map((participant) => (
-                    <label
-                      key={participant.id}
-                      style={{ display: 'flex', alignItems: 'center', padding: '0.5rem', cursor: 'pointer' }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={formData.participantsIds.includes(participant.id)}
-                        onChange={() => handleParticipantToggle(participant.id)}
-                        style={{ marginRight: '0.5rem' }}
-                      />
-                      <span>
-                        {participant.firstName} {participant.lastName} ({participant.email})
-                      </span>
-                    </label>
-                  ))
-                ) : (
-                  <p style={{ padding: '0.5rem', color: '#666' }}>Нет доступных участников</p>
-                )}
-              </div>
+              <UserMultiselect
+                users={participants || []}
+                selectedIds={formData.participantsIds}
+                onChange={(newIds) => setFormData({ ...formData, participantsIds: newIds })}
+              />
             </div>
 
             <div style={{ display: 'flex', gap: '1rem' }}>
@@ -384,8 +351,8 @@ export function ManageBetEvents() {
                 {createMutation.isPending || updateMutation.isPending
                   ? 'Сохранение...'
                   : editingEvent
-                  ? 'Сохранить изменения'
-                  : 'Создать событие'}
+                    ? 'Сохранить изменения'
+                    : 'Создать событие'}
               </button>
               <button type="button" onClick={handleCancel} className="btn btn-secondary">
                 Отмена
